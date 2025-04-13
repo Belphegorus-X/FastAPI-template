@@ -1,16 +1,11 @@
 from functools import lru_cache
 from pathlib import Path
 
-from pydantic import AnyHttpUrl, BaseModel, SecretStr, computed_field
+from pydantic import BaseModel, SecretStr, computed_field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from sqlalchemy.engine.url import URL
 
 PROJECT_DIR = Path(__file__).parent.parent.parent.parent.parent
-
-
-class Security(BaseModel):
-    allowed_hosts: list[str] = ["localhost", "127.0.0.1"]
-    backend_cors_origins: list[AnyHttpUrl] = []
 
 
 class Database(BaseModel):
@@ -31,7 +26,6 @@ class Connection(BaseModel):
 
 class Settings(BaseSettings):
     database: Database
-    security: Security
     connection: Connection
 
     @computed_field

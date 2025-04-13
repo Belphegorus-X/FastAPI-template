@@ -2,9 +2,11 @@ import enum
 
 from pydantic.main import BaseModel
 
+
 class ChatTypeModel(enum.Enum):
     group = "group"
     personal = "personal"
+
 
 class MessagesModel(BaseModel):
     message_id: str
@@ -12,6 +14,7 @@ class MessagesModel(BaseModel):
     sender_id: str
     text: str
     is_read: bool
+
 
 class ChatModel(BaseModel):
     chat_id: str
