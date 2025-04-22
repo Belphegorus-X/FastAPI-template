@@ -14,14 +14,12 @@ T = TypeVar("T", bound=Base)
 class Generator:
     def __init__(self):
         self.fake = Faker()
-        self.foreigh_key_map: dict[str, list[Any]] = {}
+        self.foreign_key_map: dict[object, list[str]] = {}
 
     def generate(self, model_class: type[T]) -> T:
         field_values = {}
 
         for column in class_mapper(model_class).columns:
-            print(column.name)
-
             field_values[column.name] = self._generate_column_value(column)
 
         return model_class(**field_values)

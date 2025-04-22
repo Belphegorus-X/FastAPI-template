@@ -5,7 +5,7 @@ from typing import Self
 
 from sqlalchemy import Enum, insert, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, mapped_column, relationship, selectinload
 from sqlalchemy.types import String, Uuid
 
 from domain.repositories.base import Base
@@ -46,7 +46,7 @@ class ChatEntry(Base):
     ) -> Self | None:
         statement = (
             select(cls)
-            .join(MessagesEntry, MessagesEntry.chat_id == cls.chat_id)
+            .options(selectinload(cls.messages))
             .where(cls.chat_id == chat_id)
         )
 

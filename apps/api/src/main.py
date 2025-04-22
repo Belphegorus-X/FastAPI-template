@@ -23,7 +23,7 @@ logging.basicConfig(
 
 
 @app.exception_handler(DomainError)
-async def domain_error_handler(request: Request, exc: DomainError):
+async def domain_error_handler(_request: Request, exc: DomainError):
     logging.info(exc.inner_message)
     return JSONResponse(
         status_code=exc.status_code, content={"code": exc.code, "message": exc.message}
