@@ -18,7 +18,7 @@ async def main() -> None:
             chat.updated_at,
             session,
         )
-        generator.foreign_key_map[MessagesEntry].append(chat.chat_id)
+        geneator.foreign_key_map[MessagesEntry].append(chat.chat_id)
 
 
 if __name__ == "__main__":

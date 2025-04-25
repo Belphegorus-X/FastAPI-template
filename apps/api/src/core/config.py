@@ -8,6 +8,12 @@ from sqlalchemy.engine.url import URL
 PROJECT_DIR = Path(__file__).parent.parent.parent.parent.parent
 
 
+class HTTPSettings(BaseModel):
+    hostname: str = "127.0.0.1"
+    port: int = 8000
+    reload: bool = True
+
+
 class Security(BaseModel):
     allowed_hosts: list[str] = ["localhost", "127.0.0.1"]
     backend_cors_origins: list[AnyHttpUrl] = []
@@ -33,6 +39,7 @@ class Settings(BaseSettings):
     database: Database
     security: Security
     connection: Connection
+    http: HTTPSettings
 
     @computed_field
     @property

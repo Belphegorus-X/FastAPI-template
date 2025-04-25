@@ -7,20 +7,25 @@ from domain.repositories.chat import ChatEntry, ChatTypeEntry
 from domain.repositories.messages import MessagesEntry
 
 
-class ChatTypeModel(enum.Enum):
-    group = "group"
-    personal = "personal"
+class ReadMessageEvent(BaseModel):
+    chat_id: str
+
+
+class NewMessageEvent(BaseModel):
+    text: str
+
+
+class ChatEventType(enum.Enum):
+    send = "send"
+    read = "read"
 
     class Config:
         orm_mode = True
 
-    @classmethod
-    def from_entry(cls, entry: ChatTypeEntry) -> Self:
-        match entry:
-            case entry.personal:
-                return ChatTypeModel.personal
-            case entry.group:
-                return ChatTypeModel.group
+
+class ChatEvent[T](BaseModel):
+    event_type: ChatEventType
+    data: T
 
 
 class MessagesModel(BaseModel):
@@ -42,6 +47,22 @@ class MessagesModel(BaseModel):
             text=entry.text,
             is_read=entry.is_read
         )
+
+
+class ChatTypeModel(enum.Enum):
+    group = "group"
+    personal = "personal"
+
+    class Config:
+        orm_mode = True
+
+    @classmethod
+    def from_entry(cls, entry: ChatTypeEntry) -> Self:
+        match entry:
+            case entry.personal:
+                return ChatTypeModel.personal
+            case entry.group:
+                return ChatTypeModel.group
 
 
 class ChatModel(BaseModel):
