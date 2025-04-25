@@ -1,0 +1,3 @@
+# FastAPI template: Chat application
+
+

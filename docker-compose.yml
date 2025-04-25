@@ -2,27 +2,53 @@ services:
   postgres:
     container_name: chat-database
     image: postgres:17
+    profiles:
+      - env
+      - app
     volumes:
       - postgres_data:/var/lib/postgresql/data
     environment:
       - POSTGRES_DB=${DATABASE__DATABASE}
       - POSTGRES_USER=${DATABASE__USERNAME}
       - POSTGRES_PASSWORD=${DATABASE__PASSWORD}
+      - PGUSER=${DATABASE__USERNAME}
     ports:
       - "${DATABASE__PORT}:5432"
     env_file:
       - .env
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d postgres"]
+      interval: 30s
+      timeout: 60s
+      retries: 5
+      start_period: 80s
     restart: always
+
+  migration:
+    container_name: chat-migration
+    build:
+      dockerfile: migration.Dockerfile
+      context: .
+    profiles:
+      - app
+      - env
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: on-failure
 
   app:
     container_name: chat-app
     build:
       dockerfile: Dockerfile
       context: .
+    profiles:
+      - app
     ports:
       - "8000:8000"
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
 
 volumes:
   postgres_data:
