@@ -9,8 +9,10 @@ from starlette.requests import Request
 from starlette.websockets import WebSocket
 
 from apps.api.src.core.config import get_settings
+from apps.api.src.endpoints.auth.endpoints import auth_router
 from apps.api.src.endpoints.chat.endpoints import chat_router
 from apps.api.src.endpoints.chat.events import ChatEvents, ChatEventType
+from apps.api.src.endpoints.user.endpoints import user_router
 from domain.domain_errors import DomainError
 
 app = FastAPI(
@@ -20,17 +22,13 @@ app = FastAPI(
     openapi_url="/openapi.json",
     docs_url="/",
 )
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
 
 @app.exception_handler(DomainError)
 async def domain_error_handler(_request: Request, exc: DomainError) -> JSONResponse:
     logging.info(exc.inner_message)
-    return JSONResponse(
-        status_code=exc.status_code, content={"code": exc.code, "message": exc.message}
-    )
+    return JSONResponse(status_code=exc.status_code, content={"code": exc.code, "message": exc.message})
 
 
 @app.websocket("/ws")
@@ -48,13 +46,12 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
 
 
 app.include_router(chat_router)
+app.include_router(user_router)
+app.include_router(auth_router)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        str(origin).rstrip("/")
-        for origin in get_settings().security.backend_cors_origins
-    ],
+    allow_origins=[str(origin).rstrip("/") for origin in get_settings().security.backend_cors_origins],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

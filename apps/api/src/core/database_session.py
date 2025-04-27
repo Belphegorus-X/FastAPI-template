@@ -10,7 +10,7 @@ from apps.api.src.core.config import Settings, get_settings
 
 def new_async_engine(settings: Settings) -> AsyncEngine:
     return create_async_engine(
-        settings.sqlalchemy_database_url,
+        str(settings.sqlalchemy_database_url),
         pool_pre_ping=settings.connection.pool_pre_ping,
         pool_size=settings.connection.pool_size,
         max_overflow=settings.connection.max_overflow,

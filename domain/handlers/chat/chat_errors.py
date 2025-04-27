@@ -7,11 +7,9 @@ from domain.domain_errors import DomainError
 
 class ChatNotFoundException(DomainError):
     def __init__(self, chat_id: UUID):
-        message = f"Cannot find chat history with id: {chat_id}"
-
         super().__init__(
-            message,
-            message,
-            1000_0001,
+            "Chat not found",
+            f"Cannot find chat history with id: {chat_id}",
+            1_0001,
             status.HTTP_404_NOT_FOUND,
         )
