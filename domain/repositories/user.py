@@ -9,10 +9,10 @@ from domain.repositories.base import Base
 class UserEntry(Base):
     __tablename__ = "user_accounts"
 
-    user_id: Mapped[str] = mapped_column(
-        Uuid(as_uuid=False),
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        Uuid(),
         primary_key=True,
-        default=lambda _: str(uuid.uuid4()),
+        default=lambda _: uuid.uuid4(),
     )
     name: Mapped[str] = mapped_column(
         String(256),

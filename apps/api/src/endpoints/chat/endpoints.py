@@ -10,10 +10,10 @@ from domain.handlers.chat.get_chat_history import (
     GetChatHistoryQueryHandler,
 )
 
-router = APIRouter()
+chat_router = APIRouter(prefix="/chat", tags=["chat"])
 
 
-@router.get(
+@chat_router.get(
     "/history/{chat_id}",
     response_model=ChatModel,
     status_code=status.HTTP_200_OK,
@@ -23,7 +23,7 @@ async def get_chat_history(
     chat_id: uuid.UUID = Path(..., title="The Uuid of the chat to fetch history"),
     session: AsyncSession = Depends(dependencies.get_session),
 ) -> ChatModel:
-    query = GetChatHistoryQuery(chat_id=str(chat_id), session=session)
-    entry = await GetChatHistoryQueryHandler()(query)
+    query = GetChatHistoryQuery(chat_id=chat_id)
+    entry = await GetChatHistoryQueryHandler(session).handle(query)
 
     return ChatModel.from_entry(entry)

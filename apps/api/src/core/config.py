@@ -15,6 +15,11 @@ class HTTPSettings(BaseModel):
 
 
 class Security(BaseModel):
+    jwt_issuer: str = "realtime-chat-app"
+    jwt_secret_key: SecretStr
+    jwt_access_token_expire_secs: int = 24 * 60 * 60  # 1d
+    jwt_refresh_token_expire_secs: int = 28 * 24 * 60 * 60  # 28d
+    password_bcrypt_rounds: int = 16
     allowed_hosts: list[str] = ["localhost", "127.0.0.1"]
     backend_cors_origins: list[AnyHttpUrl] = []
 
@@ -42,7 +47,6 @@ class Settings(BaseSettings):
     http: HTTPSettings
 
     @computed_field
-    @property
     def sqlalchemy_database_url(self) -> URL:
         return URL.create(
             drivername="postgresql+asyncpg",
@@ -57,9 +61,10 @@ class Settings(BaseSettings):
         env_file=f"{PROJECT_DIR}/.env",
         case_sensitive=False,
         env_nested_delimiter="__",
+        extra="ignore",
     )
 
 
 @lru_cache(maxsize=1)
 def get_settings() -> Settings:
-    return Settings()  # type: ignore
+    return Settings()  # type: ignore[call-arg]

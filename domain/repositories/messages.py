@@ -10,18 +10,18 @@ from domain.repositories.base import Base
 class MessagesEntry(Base):
     __tablename__ = "messages"
 
-    message_id: Mapped[str] = mapped_column(
-        Uuid(as_uuid=False),
+    message_id: Mapped[uuid.UUID] = mapped_column(
+        Uuid(),
         primary_key=True,
         default=lambda _: str(uuid.uuid4()),
     )
-    chat_id: Mapped[str] = mapped_column(
-        Uuid(as_uuid=False),
+    chat_id: Mapped[uuid.UUID] = mapped_column(
+        Uuid(),
         ForeignKey("chats.chat_id"),
         nullable=False,
     )
-    sender_id: Mapped[str] = mapped_column(
-        Uuid(as_uuid=False),
+    sender_id: Mapped[uuid.UUID] = mapped_column(
+        Uuid(),
         ForeignKey("user_accounts.user_id"),
         nullable=False,
     )
@@ -36,4 +36,4 @@ class MessagesEntry(Base):
     chat: Mapped["ChatEntry"] = relationship("ChatEntry", back_populates="messages")
 
 
-from domain.repositories.chat import ChatEntry
+from domain.repositories.chat import ChatEntry  # noqa: E402

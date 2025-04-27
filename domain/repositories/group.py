@@ -10,10 +10,10 @@ from domain.repositories.base import Base
 class GroupsEntry(Base):
     __tablename__ = "groups"
 
-    group_id: Mapped[str] = mapped_column(
-        Uuid(as_uuid=False),
+    group_id: Mapped[uuid.UUID] = mapped_column(
+        Uuid(),
         primary_key=True,
-        default=lambda _: str(uuid.uuid4()),
+        default=lambda _: uuid.uuid4(),
     )
     name: Mapped[str] = mapped_column(
         String(256),
@@ -21,8 +21,8 @@ class GroupsEntry(Base):
         unique=False,
         index=True,
     )
-    creator_id: Mapped[str] = mapped_column(
-        Uuid(as_uuid=False),
+    creator_id: Mapped[uuid.UUID] = mapped_column(
+        Uuid(),
         ForeignKey("user_accounts.user_id"),
         nullable=False,
     )
@@ -31,14 +31,14 @@ class GroupsEntry(Base):
 class GroupUsers(Base):
     __tablename__ = "group_users"
 
-    group_id: Mapped[str] = mapped_column(
-        Uuid(as_uuid=False),
+    group_id: Mapped[uuid.UUID] = mapped_column(
+        Uuid(),
         ForeignKey("groups.group_id"),
         nullable=False,
         primary_key=True,
     )
-    user_id: Mapped[str] = mapped_column(
-        Uuid(as_uuid=False),
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        Uuid(),
         ForeignKey("user_accounts.user_id"),
         nullable=False,
         primary_key=True,

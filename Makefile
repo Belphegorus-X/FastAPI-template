@@ -18,3 +18,17 @@ docker-app-clean:
 
 migrate:
 	python3 -m alembic upgrade head
+
+revert:
+	python3 -m alembic downgrade base
+
+format:
+	ruff format
+
+mypy:
+	mypy .
+
+ruff:
+	ruff check
+
+lint: mypy ruff

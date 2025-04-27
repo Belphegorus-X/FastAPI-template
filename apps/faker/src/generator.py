@@ -1,22 +1,18 @@
-
-from typing import Any, TypeVar
+from typing import Any
+from uuid import UUID
 
 from faker import Faker
 from sqlalchemy import Column, DateTime, Integer, String
 from sqlalchemy.orm import class_mapper
 from sqlalchemy.types import Enum
 
-from domain.repositories.base import Base
-
-T = TypeVar("T", bound=Base)
-
 
 class Generator:
-    def __init__(self):
+    def __init__(self) -> None:
         self.fake = Faker()
-        self.foreign_key_map: dict[object, list[str]] = {}
+        self.foreign_key_map: dict[object, list[UUID]] = {}
 
-    def generate(self, model_class: type[T]) -> T:
+    def generate[T](self, model_class: type[T]) -> T:
         field_values = {}
 
         for column in class_mapper(model_class).columns:
@@ -24,7 +20,7 @@ class Generator:
 
         return model_class(**field_values)
 
-    def _generate_column_value(self, column: Column[Any]):
+    def _generate_column_value(self, column: Column[Any]) -> Any:
         if column.primary_key:
             return None
 

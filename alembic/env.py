@@ -1,12 +1,20 @@
 import asyncio
 from logging.config import fileConfig
+from os import environ
 
+from dotenv import load_dotenv
 from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from alembic import context
 from domain.repositories.base import Base
+from domain.repositories.chat import ChatEntry, ChatTypeEntry  # noqa: F401
+from domain.repositories.group import GroupsEntry, GroupUsers  # noqa: F401
+from domain.repositories.messages import MessagesEntry  # noqa: F401
+from domain.repositories.user import UserEntry  # noqa: F401
+
+load_dotenv()
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -29,6 +37,13 @@ target_metadata = Base.metadata
 # ... etc.
 
 
+POSTGRES_HOSTNAME = environ.get("POSTGRES_HOSTNAME")
+POSTGRES_USERNAME = environ.get("POSTGRES_USERNAME")
+POSTGRES_PASSWORD = environ.get("POSTGRES_PASSWORD")
+POSTGRES_DATABASE = environ.get("POSTGRES_DATABASE")
+POSTGRES_PORT = int(environ.get("POSTGRES_PORT", "5432"))
+
+
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode.
 
@@ -41,7 +56,15 @@ def run_migrations_offline() -> None:
     script output.
 
     """
-    url = config.get_main_option("sqlalchemy.url")
+    section = config.get_section(config.config_ini_section, {})
+    url = section.get("sqlalchemy.url", "").format(
+        POSTGRES_USERNAME,
+        POSTGRES_PASSWORD,
+        POSTGRES_HOSTNAME,
+        POSTGRES_PORT,
+        POSTGRES_DATABASE,
+    )
+
     context.configure(
         url=url,
         target_metadata=target_metadata,
@@ -65,9 +88,18 @@ async def run_async_migrations() -> None:
     and associate a connection with the context.
 
     """
+    section = config.get_section(config.config_ini_section, {})
+    url = section.get("sqlalchemy.url", "").format(
+        POSTGRES_USERNAME,
+        POSTGRES_PASSWORD,
+        POSTGRES_HOSTNAME,
+        POSTGRES_PORT,
+        POSTGRES_DATABASE,
+    )
+    section["sqlalchemy.url"] = url
 
     connectable = async_engine_from_config(
-        config.get_section(config.config_ini_section, {}),
+        section,
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
     )

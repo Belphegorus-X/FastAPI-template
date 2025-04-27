@@ -19,10 +19,10 @@ class ChatTypeEntry(enum.Enum):
 class ChatEntry(Base):
     __tablename__ = "chats"
 
-    chat_id: Mapped[str] = mapped_column(
-        Uuid(as_uuid=False),
+    chat_id: Mapped[uuid.UUID] = mapped_column(
+        Uuid(),
         primary_key=True,
-        default=lambda _: str(uuid.uuid4()),
+        default=lambda _: uuid.uuid4(),
     )
     name: Mapped[str] = mapped_column(
         String(256),
@@ -42,7 +42,7 @@ class ChatEntry(Base):
 
     @classmethod
     async def get_chat_history(
-        cls, chat_id: str, session: AsyncSession
+        cls, chat_id: uuid.UUID, session: AsyncSession
     ) -> Self | None:
         statement = (
             select(cls)
@@ -80,4 +80,4 @@ class ChatEntry(Base):
         return result.scalar_one()
 
 
-from domain.repositories.messages import MessagesEntry
+from domain.repositories.messages import MessagesEntry  # noqa: E402

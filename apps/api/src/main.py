@@ -1,4 +1,3 @@
-import json
 import logging
 
 import uvicorn
@@ -10,8 +9,8 @@ from starlette.requests import Request
 from starlette.websockets import WebSocket
 
 from apps.api.src.core.config import get_settings
-from apps.api.src.endpoints.chat.endpoints import router
-from apps.api.src.endpoints.chat.models import ChatEventType, NewMessageEvent, ReadMessageEvent
+from apps.api.src.endpoints.chat.endpoints import chat_router
+from apps.api.src.endpoints.chat.events import ChatEvents, ChatEventType
 from domain.domain_errors import DomainError
 
 app = FastAPI(
@@ -27,30 +26,28 @@ logging.basicConfig(
 
 
 @app.exception_handler(DomainError)
-async def domain_error_handler(_request: Request, exc: DomainError):
+async def domain_error_handler(_request: Request, exc: DomainError) -> JSONResponse:
     logging.info(exc.inner_message)
     return JSONResponse(
         status_code=exc.status_code, content={"code": exc.code, "message": exc.message}
     )
 
+
 @app.websocket("/ws")
-async def websocket_endpoint(websocket: WebSocket):
+async def websocket_endpoint(websocket: WebSocket) -> None:
     await websocket.accept()
     while True:
         text = await websocket.receive_text()
-        event = json.loads(text)
-        event_type = ChatEventType(event["event_type"])
+        event = ChatEvents.model_validate_json(text)  # type: ignore[attr-defined]
 
-        match event_type:
+        match event.event_type:
             case ChatEventType.send:
-                message = NewMessageEvent.model_validate_json(event["data"])
-                print("message", message.text)
+                print("message", event.data.text)
             case ChatEventType.read:
-                message = ReadMessageEvent.model_dump_json(event["data"])
-                print("read", message.chat_id)
+                print("Read", event.data.chat_id)
 
 
-app.include_router(router)
+app.include_router(chat_router)
 
 app.add_middleware(
     CORSMiddleware,
@@ -69,11 +66,11 @@ app.add_middleware(
 )
 
 
-def main():
+def main() -> None:
     config = get_settings()
 
     uvicorn.run(
-        "main:app",
+        "apps.api.src.main:app",
         host=config.http.hostname,
         port=config.http.port,
         reload=config.http.reload,

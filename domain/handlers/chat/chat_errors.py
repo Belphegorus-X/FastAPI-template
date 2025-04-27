@@ -1,3 +1,4 @@
+from uuid import UUID
 
 from fastapi import status
 
@@ -5,7 +6,7 @@ from domain.domain_errors import DomainError
 
 
 class ChatNotFoundException(DomainError):
-    def __init__(self, chat_id: str):
+    def __init__(self, chat_id: UUID):
         message = f"Cannot find chat history with id: {chat_id}"
 
         super().__init__(
