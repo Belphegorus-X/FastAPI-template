@@ -37,18 +37,16 @@ class ChatEntry(Base):
     )
     messages: Mapped[list["MessagesEntry"]] = relationship(
         "MessagesEntry",
-        back_populates="chat",
+        back_populates="chats",
     )
 
     @classmethod
     async def get_chat_history(
-        cls, chat_id: uuid.UUID, session: AsyncSession
+        cls,
+        chat_id: uuid.UUID,
+        session: AsyncSession,
     ) -> Self | None:
-        statement = (
-            select(cls)
-            .options(selectinload(cls.messages))
-            .where(cls.chat_id == chat_id)
-        )
+        statement = select(cls).options(selectinload(cls.messages)).where(cls.chat_id == chat_id)
 
         result = await session.execute(statement)
         chat_entry = result.scalar_one_or_none()

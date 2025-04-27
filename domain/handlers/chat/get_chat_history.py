@@ -1,15 +1,14 @@
-import uuid
-from dataclasses import dataclass
+from uuid import UUID
 
+from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from domain.handlers.chat.chat_errors import ChatNotFoundException
 from domain.repositories.chat import ChatEntry
 
 
-@dataclass
-class GetChatHistoryQuery:
-    chat_id: uuid.UUID
+class GetChatHistoryQuery(BaseModel):
+    chat_id: UUID
 
 
 class GetChatHistoryQueryHandler:

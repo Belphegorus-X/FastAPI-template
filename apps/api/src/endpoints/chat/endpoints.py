@@ -14,7 +14,7 @@ chat_router = APIRouter(prefix="/chat", tags=["chat"])
 
 
 @chat_router.get(
-    "/history/{chat_id}",
+    "/history/{chat_id}/",
     response_model=ChatModel,
     status_code=status.HTTP_200_OK,
     description="Get message history for the chat",
